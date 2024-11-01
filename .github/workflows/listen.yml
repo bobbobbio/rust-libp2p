@@ -1,0 +1,23 @@
+name: Continuous integration
+
+on:
+  workflow_dispatch:
+
+env:
+  RUST_LOG: info
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build
+        run: cargo build --release --bin dcutr-example
+
+      - name: Listen
+        run: target/release/dcutr-example --secret-key-seed 1 --mode listen --relay-address /ip4/107.170.193.89/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN
