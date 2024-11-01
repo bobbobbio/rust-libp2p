@@ -1,4 +1,4 @@
-name: Continuous integration
+name: Listen
 
 on:
   workflow_dispatch:

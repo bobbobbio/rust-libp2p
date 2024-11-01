@@ -1,4 +1,4 @@
-name: Continuous integration
+name: Connect
 
 on:
   workflow_dispatch:
