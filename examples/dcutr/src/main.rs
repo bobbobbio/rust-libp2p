@@ -163,6 +163,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     learned_observed_addr = true;
                 },
                 SwarmEvent::NewExternalAddrOfPeer { .. } => {},
+                SwarmEvent::NewExternalAddrCandidate { .. } => {},
                 event => panic!("{event:?}"),
             }
 
