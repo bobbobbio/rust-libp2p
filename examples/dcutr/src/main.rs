@@ -162,8 +162,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     tracing::info!(address=%observed_addr, "Relay told us our observed address");
                     learned_observed_addr = true;
                 },
-                SwarmEvent::NewExternalAddrOfPeer { .. } => {},
-                SwarmEvent::NewExternalAddrCandidate { .. } => {},
+                event @ SwarmEvent::NewExternalAddrOfPeer { .. } => tracing::info!("{event:?}"),
+                event @ SwarmEvent::NewExternalAddrCandidate { .. } => tracing::info!("{event:?}"),
                 event => panic!("{event:?}"),
             }
 
