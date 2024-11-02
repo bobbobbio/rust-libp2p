@@ -69,6 +69,21 @@ impl FromStr for Mode {
     }
 }
 
+fn find_local_addr(addrs: Vec<Multiaddr>) -> Option<Multiaddr> {
+    for addr in addrs {
+        for comp in addr.iter() {
+            if let libp2p::core::multiaddr::Protocol::Ip4(ip) = comp {
+                let octets = ip.octets();
+                if octets[0] == 10 && octets[1] == 1 && octets[2] == 0 {
+                    return Some(addr);
+                }
+            }
+        }
+    }
+
+    None
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let _ = tracing_subscriber::fmt()
@@ -191,6 +206,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     block_on(async {
+        let mut local_addr: Option<Multiaddr> = None;
         loop {
             match swarm.next().await.unwrap() {
                 SwarmEvent::NewListenAddr { address, .. } => {
@@ -208,6 +224,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 SwarmEvent::Behaviour(BehaviourEvent::Dcutr(event)) => {
                     tracing::info!(?event)
                 }
+                SwarmEvent::Behaviour(BehaviourEvent::Identify(identify::Event::Received {
+                    info: identify::Info { listen_addrs, .. },
+                    ..
+                })) => {
+                    local_addr = find_local_addr(listen_addrs);
+                    tracing::info!(?local_addr, "Discovered local address for peer");
+                }
                 SwarmEvent::Behaviour(BehaviourEvent::Identify(event)) => {
                     tracing::info!(?event)
                 }
@@ -219,6 +242,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 }
                 SwarmEvent::OutgoingConnectionError { peer_id, error, .. } => {
                     tracing::info!(peer=?peer_id, "Outgoing connection failed: {error}");
+
+                    if opts.mode == Mode::Dial {
+                        tracing::info!(?local_addr, "Attempting to dial local addr");
+                        swarm.dial(local_addr.clone().unwrap()).unwrap();
+                    }
                 }
                 _ => {}
             }
