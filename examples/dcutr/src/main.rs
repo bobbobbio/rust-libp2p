@@ -70,13 +70,19 @@ impl FromStr for Mode {
 }
 
 fn find_local_addr(addrs: Vec<Multiaddr>) -> Option<Multiaddr> {
+    use libp2p::core::multiaddr::Protocol;
+
     for addr in addrs {
+        let mut correct_ip = false;
         for comp in addr.iter() {
-            if let libp2p::core::multiaddr::Protocol::Ip4(ip) = comp {
+            if let Protocol::Ip4(ip) = comp {
                 let octets = ip.octets();
                 if octets[0] == 10 && octets[1] == 1 && octets[2] == 0 {
-                    return Some(addr);
+                    correct_ip = true;
                 }
+            }
+            if matches!(comp, Protocol::Tcp(_)) && correct_ip {
+                return Some(addr);
             }
         }
     }
