@@ -1,4 +1,4 @@
-name: Listen
+name: Listen and Connect
 
 on:
   workflow_dispatch:
