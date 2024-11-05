@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 export RUST_LOG=info
 
 if [[ "$ACTION" == 1 ]]; then

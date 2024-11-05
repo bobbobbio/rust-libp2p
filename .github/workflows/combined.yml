@@ -23,6 +23,6 @@ jobs:
         run: cargo build --release --bin dcutr-example
 
       - name: Action
-        run: do-it.sh
+        run: ./do-it.sh
         env:
           ACTION: ${{ matrix.action }}
