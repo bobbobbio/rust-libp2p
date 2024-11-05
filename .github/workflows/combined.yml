@@ -1,0 +1,28 @@
+name: Listen
+
+on:
+  workflow_dispatch:
+
+env:
+  RUST_LOG: info
+jobs:
+  test:
+    strategy:
+      matrix:
+        action: [1, 2]
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build
+        run: cargo build --release --bin dcutr-example
+
+      - name: Action
+        run: do-it.sh
+        env:
+          ACTION: ${{ matrix.action }}
